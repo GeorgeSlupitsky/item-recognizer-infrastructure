@@ -1,0 +1,40 @@
+{
+  "os":  "macOS-15.5-arm64-arm-64bit-Mach-O",
+  "python":  "CPython 3.13.3",
+  "startedAt":  "2025-06-20T12:06:37.898783Z",
+  "program":  "/Users/y.slupitskyi/Work/mlops/item_recognizer/model/cnn-cpu/minimal_test.py",
+  "codePath":  "model/cnn-cpu/minimal_test.py",
+  "email":  "postpunk91@gmail.com",
+  "root":  "/Users/y.slupitskyi/Work/mlops/item_recognizer/model/cnn-cpu",
+  "host":  "yslupitskyi-mJW",
+  "executable":  "/Users/y.slupitskyi/.local/pipx/venvs/pyspark/bin/python",
+  "codePathLocal":  "minimal_test.py",
+  "cpu_count":  12,
+  "cpu_count_logical":  12,
+  "disk":  {
+    "/":  {
+      "total":  "994662584320",
+      "used":  "959525609472"
+    },
+    "/System/Volumes/Data":  {
+      "total":  "994662584320",
+      "used":  "959525609472"
+    }
+  },
+  "memory":  {
+    "total":  "34359738368"
+  },
+  "cpu":  {
+    "count":  12,
+    "countLogical":  12
+  },
+  "apple":  {
+    "name":  "Apple M2 Max",
+    "ecpuCores":  4,
+    "pcpuCores":  8,
+    "gpuCores":  38,
+    "memoryGb":  32,
+    "swapTotalBytes":  "12884901888",
+    "ramTotalBytes":  "34359738368"
+  }
+}

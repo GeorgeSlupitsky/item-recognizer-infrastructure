@@ -1,0 +1,38 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: ray-cluster
+nodes:
+- role: control-plane
+  extraPortMappings:
+  # Standard web ports (might be useful for other services)
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        system-reserved: memory=1Gi
+        eviction-hard: memory.available<500Mi
+        eviction-soft: memory.available<1Gi
+        eviction-soft-grace-period: memory.available=30s
+  extraMounts:
+  - hostPath: /tmp/kubeflow-data
+    containerPath: /data
+- role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        system-reserved: memory=1Gi
+        eviction-hard: memory.available<500Mi
+        eviction-soft: memory.available<1Gi
+        eviction-soft-grace-period: memory.available=30s
+  extraMounts:
+  - hostPath: /tmp/kubeflow-data
+    containerPath: /data

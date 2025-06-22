@@ -1,0 +1,14 @@
+# Training run configuration
+run_name: "custom-cnn-ray"
+
+# Data configuration
+json_path: "/data/label_studio_export.json"
+img_size: [128, 128]
+
+# Model configuration
+model_save_path: "/data/model/cnn-cpu/best_custom_cnn.keras"
+
+# Training parameters
+batch_size: 8
+epochs: 20
+num_workers: 2

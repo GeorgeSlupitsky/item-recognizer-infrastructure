@@ -1,0 +1,126 @@
+# Values file for kube-prometheus-stack Helm chart
+# This configures Prometheus and Grafana for Ray cluster monitoring
+
+prometheus:
+  prometheusSpec:
+    # Enable service monitor selector to discover Ray services
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
+    
+    # Enable pod monitor selector to discover Ray pods
+    podMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelector: {}
+    
+    # Enable prometheus rule selector
+    ruleSelectorNilUsesHelmValues: false
+    ruleSelector: {}
+    
+    # Storage configuration
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: standard
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+    
+    # Resource limits
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+    
+    # Data retention
+    retention: "15d"
+
+grafana:
+  # Admin credentials
+  adminPassword: "prom-operator"
+  
+  # Enable persistence
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClassName: standard
+  
+  # Resource limits
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  # Grafana configuration for Ray Dashboard iframe integration
+  grafana.ini:
+    server:
+      domain: localhost
+      root_url: "http://localhost:3000"
+    security:
+      allow_embedding: true
+      cookie_secure: false
+      cookie_samesite: lax
+    auth.anonymous:
+      enabled: true
+      org_role: Viewer
+      org_name: Main Org.
+    panels:
+      enable_alpha: true
+  
+  # Sidecar configuration for automatic dashboard loading
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      folder: /tmp/dashboards
+      searchNamespace: ALL
+  
+  # Default dashboards
+  defaultDashboardsEnabled: true
+  
+  # Note: Removed additionalDataSources to avoid conflicts with default Prometheus datasource
+
+# Alertmanager configuration
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+    
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: standard
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
+
+# Node exporter (for system metrics)
+nodeExporter:
+  enabled: true
+
+# Kube state metrics
+kubeStateMetrics:
+  enabled: true
+
+# Prometheus operator
+prometheusOperator:
+  enabled: true
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m" 

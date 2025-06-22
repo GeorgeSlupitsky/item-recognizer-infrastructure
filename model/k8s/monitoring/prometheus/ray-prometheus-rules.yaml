@@ -1,0 +1,85 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ray-cluster-rules
+  namespace: prometheus-system
+  labels:
+    # This label is required for Prometheus to discover PrometheusRule
+    release: prometheus
+spec:
+  groups:
+  - name: ray-cluster.rules
+    interval: 30s
+    rules:
+    # Recording Rules - precompute frequently used metrics
+    - record: ray_gcs_availability_30d
+      expr: |
+        (
+          100 * (
+            sum(rate(ray_gcs_update_resource_usage_time_bucket{container="ray-head", le="20.0"}[30d]))
+            /
+            sum(rate(ray_gcs_update_resource_usage_time_count{container="ray-head"}[30d]))
+          )
+        )
+    
+    - record: ray_cluster_worker_count
+      expr: count(ray_node_cpu_utilization{ray_node_type="worker"})
+    
+    - record: ray_cluster_cpu_utilization_avg
+      expr: avg(ray_node_cpu_utilization)
+    
+    - record: ray_cluster_memory_utilization_avg
+      expr: avg(ray_node_memory_utilization)
+    
+    # Alerting Rules - define alert conditions
+    - alert: MissingMetricRayGlobalControlStore
+      annotations:
+        description: "Ray GCS is not emitting any metrics for Resource Update requests"
+        summary: "Ray GCS is not emitting metrics anymore"
+      expr: |
+        (
+          absent(ray_gcs_update_resource_usage_time_bucket) == 1
+        )
+      for: 5m
+      labels:
+        severity: critical
+    
+    - alert: RayClusterDown
+      annotations:
+        description: "Ray cluster {{ $labels.ray_cluster_name }} appears to be down"
+        summary: "Ray cluster is not responding"
+      expr: |
+        absent(ray_cluster_state) == 1
+      for: 2m
+      labels:
+        severity: critical
+    
+    - alert: RayHighCPUUtilization
+      annotations:
+        description: "Ray cluster CPU utilization is above 85%: {{ $value }}%"
+        summary: "High CPU utilization in Ray cluster"
+      expr: |
+        ray_cluster_cpu_utilization_avg > 85
+      for: 5m
+      labels:
+        severity: warning
+    
+    - alert: RayHighMemoryUtilization
+      annotations:
+        description: "Ray cluster memory utilization is above 90%: {{ $value }}%"
+        summary: "High memory utilization in Ray cluster"
+      expr: |
+        ray_cluster_memory_utilization_avg > 90
+      for: 5m
+      labels:
+        severity: warning
+    
+    - alert: RayWorkerNodeDown
+      annotations:
+        description: "Ray worker node {{ $labels.instance }} is down"
+        summary: "Ray worker node is not available"
+      expr: |
+        up{job="ray-workers-monitor"} == 0
+      for: 2m
+      labels:
+        severity: warning 

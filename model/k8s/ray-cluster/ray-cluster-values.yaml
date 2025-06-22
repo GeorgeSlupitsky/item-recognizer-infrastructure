@@ -1,0 +1,120 @@
+# Конфігурація образу
+image:
+  repository: spodarets/ray-worker
+  tag: "2.46.0-py310-aarch64"
+  pullPolicy: IfNotPresent
+
+# Конфігурація головного вузла
+head:
+  # Увімкнути автомасштабування
+  enableInTreeAutoscaling: true
+  autoscalerOptions:
+    upscalingMode: Default
+    idleTimeoutSeconds: 60
+    
+  # Install dependencies before starting Ray
+  command: ["/bin/bash", "-c"]
+  args:
+    - |
+      pip install "typing-extensions>=4.8.0" "tensorflow==2.15.0" "wandb[keras]" "scikit-learn" "ray[default]" && \
+      ray start --head --port=6379 --dashboard-host=0.0.0.0 --metrics-export-port=8080 --num-cpus=2 --block
+
+  # Параметри запуску Ray
+  rayStartParams:
+    num-cpus: "2"
+    dashboard-host: "0.0.0.0"
+    metrics-export-port: "8080"
+  
+  # Змінні середовища для інтеграції з Grafana
+  containerEnv:
+  - name: RAY_GRAFANA_IFRAME_HOST
+    value: "http://127.0.0.1:3000"
+  - name: RAY_GRAFANA_HOST
+    value: "http://prometheus-grafana.prometheus-system.svc:80"
+  - name: RAY_PROMETHEUS_HOST
+    value: "http://prometheus-kube-prometheus-prometheus.prometheus-system.svc:9090"
+  - name: RAY_PROMETHEUS_NAME
+    value: "Prometheus"
+  
+  # Ресурси головного вузла
+  resources:
+    limits:
+      cpu: "4"
+      memory: "5Gi"
+    requests:
+      cpu: "2"
+      memory: "3Gi"
+
+  # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+  # Дозволяємо scheduling kuberay подів на master / control-plane 
+  tolerations:
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+
+  # mount binding for /data from the kind & host
+  volumes:
+    - name: dataset-storage
+      hostPath:
+        # hostPath => /tmp/kubeflow-data from extraMounts
+        path: /data
+        type: DirectoryOrCreate
+
+  volumeMounts:
+    - name: dataset-storage
+      mountPath: /data
+
+# Конфігурація робочого вузла - масштабування до нуля
+worker:
+  replicas: 1
+  minReplicas: 1
+  maxReplicas: 10
+  
+  # Install dependencies before starting Ray
+  command: ["/bin/bash", "-c"]
+  args:
+    - |
+      pip install "typing-extensions>=4.8.0" "tensorflow==2.15.0" "wandb[keras]" "scikit-learn" "ray[default]" && \
+      ray start --address=raycluster-kuberay-head-svc.default.svc.cluster.local:6379 --block --dashboard-agent-listen-port=52365 --memory=2000000000 --object-store-memory=1000000000 --metrics-export-port=8080 --num-cpus=3
+  
+  # Параметри Ray для робочих вузлів
+  rayStartParams:
+    metrics-export-port: "8080"
+  
+  # Змінні середовища для робочих вузлів
+  containerEnv:
+  - name: RAY_GRAFANA_IFRAME_HOST
+    value: "http://127.0.0.1:3000"
+  - name: RAY_GRAFANA_HOST
+    value: "http://prometheus-grafana.prometheus-system.svc:80"
+  - name: RAY_PROMETHEUS_HOST
+    value: "http://prometheus-kube-prometheus-prometheus.prometheus-system.svc:9090"
+  - name: RAY_PROMETHEUS_NAME
+    value: "Prometheus"
+  
+  # Ресурси робочого вузла
+  resources:
+    limits:
+      cpu: "4"
+      memory: "5Gi"
+    requests:
+      cpu: "2"
+      memory: "3Gi"
+
+  # Allow scheduling on control-plane nodes
+  tolerations:
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+
+  # mount binding for /data from the kind & host
+  volumes:
+    - name: dataset-storage
+      hostPath:
+        # hostPath => /tmp/kubeflow-data from extraMounts
+        path: /data
+        type: DirectoryOrCreate
+
+  volumeMounts:
+    - name: dataset-storage
+      mountPath: /data

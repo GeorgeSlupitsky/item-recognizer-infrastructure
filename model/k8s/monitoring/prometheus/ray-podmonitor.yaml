@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: ray-workers-monitor
+  namespace: default
+  labels:
+    # This label is required for Prometheus to discover this PodMonitor
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      ray.io/node-type: worker
+  podMetricsEndpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics 
