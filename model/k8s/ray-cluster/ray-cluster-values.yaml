@@ -16,7 +16,7 @@ head:
   command: ["/bin/bash", "-c"]
   args:
     - |
-      pip install "typing-extensions>=4.8.0" "tensorflow==2.15.0" "wandb[keras]" "scikit-learn" "ray[default]" && \
+      pip install "typing-extensions>=4.8.0" "tensorflow==2.15.0" "wandb[keras]" "scikit-learn" "ray[default]" "Pillow" "python-dotenv" && \
       ray start --head --port=6379 --dashboard-host=0.0.0.0 --metrics-export-port=8080 --num-cpus=2 --block
 
   # Параметри запуску Ray
@@ -74,7 +74,7 @@ worker:
   command: ["/bin/bash", "-c"]
   args:
     - |
-      pip install "typing-extensions>=4.8.0" "tensorflow==2.15.0" "wandb[keras]" "scikit-learn" "ray[default]" && \
+      pip install "typing-extensions>=4.8.0" "tensorflow==2.15.0" "wandb[keras]" "scikit-learn" "ray[default]" "Pillow" "python-dotenv" && \
       ray start --address=raycluster-kuberay-head-svc.default.svc.cluster.local:6379 --block --dashboard-agent-listen-port=52365 --memory=2000000000 --object-store-memory=1000000000 --metrics-export-port=8080 --num-cpus=3
   
   # Параметри Ray для робочих вузлів
