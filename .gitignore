@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtualenv
+.venv/
+env/
+venv/
+ENV/
+
+# VSCode settings (якщо використовуєш)
+.vscode/
+
+# DVC
+.dvc/*
+*.dvc
+!.dvc/.gitignore
+!.dvc/config
+.dvc/cache/
+.dvc/tmp/
+
+# DVC data
+data/minio-data/
+data/postgres-data/
+data/mydata/
+data/dataset/
+
+# Ray & K8s logs
+ray-aws/**
+k8s/**
+
+# Environment & secrets
+.env
+**/.env
+
+# DVC ignore
+.dvcignore
+
+# Logs and checkpoints
+*.log
+*.out
+*.err
+*.bak
+*.tmp
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
