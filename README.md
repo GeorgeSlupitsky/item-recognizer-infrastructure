@@ -36,7 +36,7 @@ dvc remote modify storage --local access_key_id ${MINIO_ACCESS_KEY}
 dvc remote modify storage --local secret_access_key ${MINIO_SECRET_KEY}
 ```
 
-### 🔄 HW2: Ray + W&B Integration
+### ✅ HW2: Ray + W&B Integration
 - Implemented distributed CNN training using Ray
 - Integrated Weights & Biases for experiment tracking
 - Key features:
