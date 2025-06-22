@@ -36,6 +36,10 @@ k8s/**
 .env
 **/.env
 
+# Weights & Biases
+model/cnn-cpu/wandb/
+*.wandb
+
 
 # Logs and checkpoints
 *.log
