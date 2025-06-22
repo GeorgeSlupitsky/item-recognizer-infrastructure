@@ -36,8 +36,6 @@ k8s/**
 .env
 **/.env
 
-# DVC ignore
-.dvcignore
 
 # Logs and checkpoints
 *.log
