@@ -36,8 +36,10 @@ k8s/**
 .env
 **/.env
 
-# DVC ignore
-.dvcignore
+# Weights & Biases
+model/cnn-cpu/wandb/
+*.wandb
+
 
 # Logs and checkpoints
 *.log
