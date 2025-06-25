@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-cnn-serve
+spec:
+  template:
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: deploy-cnn
+        image: spodarets/ray-worker:2.46.0-py310-aarch64
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            pip install "tensorflow==2.13.0" "keras==2.13.1" "wandb==0.16.6" "fastapi==0.95.2" "uvicorn==0.22.0" "Pillow==10.2.0" "python-multipart==0.0.9" "python-dotenv==1.0.1" && \
+            python /app/deploy.py
+        env:
+        - name: RAY_ADDRESS
+          value: "ray://raycluster-kuberay-head-svc.default.svc.cluster.local:10001"
+        - name: RAY_NAMESPACE
+          value: "default"
+        envFrom:
+        - configMapRef:
+            name: cnn-serve-env
+        - secretRef:
+            name: cnn-serve-secret
+        resources:
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+          requests:
+            cpu: "1"
+            memory: "1Gi"
+        volumeMounts:
+          - mountPath: /app
+            name: serve-code
+      volumes:
+        - name: serve-code
+          configMap:
+            name: cnn-serve-code
+            defaultMode: 0755
+      restartPolicy: Never
+  backoffLimit: 4

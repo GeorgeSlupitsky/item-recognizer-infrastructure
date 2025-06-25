@@ -1,0 +1,49 @@
+{
+    "os": "macOS-15.5-arm64-arm-64bit",
+    "python": "3.10.17",
+    "heartbeatAt": "2025-06-25T07:59:33.786171",
+    "startedAt": "2025-06-25T07:59:29.477810",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/y.slupitskyi/Work/mlops/item_recognizer/model/cnn-cpu/serve/test.py",
+    "codePathLocal": "test.py",
+    "codePath": "model/cnn-cpu/serve/test.py",
+    "git": {
+        "remote": "https://github.com/GeorgeSlupitsky/item-recognizer-infrastructure.git",
+        "commit": "69f93f219199475306ad4b94ce3f724e448842ec"
+    },
+    "email": "y.slupitskyi@ocado.com",
+    "root": "/Users/y.slupitskyi/Work/mlops/item_recognizer",
+    "host": "yslupitskyi-mJW",
+    "username": "y.slupitskyi",
+    "executable": "/Users/y.slupitskyi/Work/mlops/item_recognizer/model/cnn-cpu/.venv/bin/python",
+    "cpu_count": 12,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 3696,
+        "min": 702,
+        "max": 3696
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3696,
+            "min": 702,
+            "max": 3696
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 926.3517189025879,
+            "used": 10.476001739501953
+        }
+    },
+    "gpuapple": {
+        "type": "arm",
+        "vendor": "Apple"
+    },
+    "memory": {
+        "total": 32.0
+    }
+}

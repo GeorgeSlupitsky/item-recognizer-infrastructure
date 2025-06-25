@@ -1,0 +1,69 @@
+{
+    "os": "macOS-15.5-arm64-arm-64bit",
+    "python": "3.10.17",
+    "heartbeatAt": "2025-06-23T12:27:50.809147",
+    "startedAt": "2025-06-23T12:27:47.982961",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--node-ip-address=127.0.0.1",
+        "--node-manager-port=59150",
+        "--object-store-name=/tmp/ray/session_2025-06-23_13-26-55_619130_27314/sockets/plasma_store",
+        "--raylet-name=/tmp/ray/session_2025-06-23_13-26-55_619130_27314/sockets/raylet",
+        "--redis-address=None",
+        "--metrics-agent-port=63513",
+        "--logging-rotate-bytes=536870912",
+        "--logging-rotate-backup-count=5",
+        "--runtime-env-agent-port=61327",
+        "--gcs-address=127.0.0.1:64948",
+        "--session-name=session_2025-06-23_13-26-55_619130_27314",
+        "--temp-dir=/tmp/ray",
+        "--webui=127.0.0.1:8266",
+        "--cluster-id=7e12f7f5d39e8e8579572f73912c2541ab6fc938d2d6bd3a7b757c5d",
+        "--startup-token=2",
+        "--worker-launch-time-ms=1750681619476",
+        "--node-id=d6f669728d781c2f6323223373620462720a18896fd502323e6898b7",
+        "--runtime-env-hash=0",
+        "--enable-resource-isolation=false"
+    ],
+    "state": "running",
+    "program": "/Users/y.slupitskyi/Work/mlops/item_recognizer/model/cnn-cpu/.venv/lib/python3.10/site-packages/ray/_private/workers/default_worker.py",
+    "codePathLocal": null,
+    "codePath": "model/cnn-cpu/.venv/lib/python3.10/site-packages/ray/_private/workers/default_worker.py",
+    "git": {
+        "remote": "https://github.com/GeorgeSlupitsky/item-recognizer-infrastructure.git",
+        "commit": "69f93f219199475306ad4b94ce3f724e448842ec"
+    },
+    "email": "y.slupitskyi@ocado.com",
+    "root": "/Users/y.slupitskyi/Work/mlops/item_recognizer",
+    "host": "yslupitskyi-mJW",
+    "username": "y.slupitskyi",
+    "executable": "/Users/y.slupitskyi/Work/mlops/item_recognizer/model/cnn-cpu/.venv/bin/python",
+    "cpu_count": 12,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 3696,
+        "min": 702,
+        "max": 3696
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3696,
+            "min": 702,
+            "max": 3696
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 926.3517189025879,
+            "used": 10.476001739501953
+        }
+    },
+    "gpuapple": {
+        "type": "arm",
+        "vendor": "Apple"
+    },
+    "memory": {
+        "total": 32.0
+    }
+}
