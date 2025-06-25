@@ -1,3 +1,0 @@
-['remote "storage"']
-    access_key_id = minioadmin
-    secret_access_key = minioadmin

@@ -19,8 +19,7 @@ ENV/
 *.dvc
 !.dvc/.gitignore
 !.dvc/config
-.dvc/cache/
-.dvc/tmp/
+
 
 # DVC data
 data/minio-data/
@@ -37,8 +36,10 @@ k8s/**
 **/.env
 
 # Weights & Biases
-model/cnn-cpu/wandb/
+wandb/
+**/wandb/
 *.wandb
+wandb-debug.log
 
 
 # Logs and checkpoints
