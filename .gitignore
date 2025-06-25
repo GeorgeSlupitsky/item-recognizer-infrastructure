@@ -38,9 +38,9 @@ k8s/**
 # Weights & Biases
 wandb/
 **/wandb/
-*.wandb
+**/wandb/**/*
 wandb-debug.log
-
+*.wandb
 
 # Logs and checkpoints
 *.log
