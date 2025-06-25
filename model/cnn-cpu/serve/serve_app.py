@@ -44,7 +44,7 @@ class APIIngress:
 )
 class CNNModel:
     def __init__(self):
-        class_names_str = os.getenv("CLASS_NAMES", "Coin,Spoon,Fork,Knife")
+        class_names_str = os.getenv("CLASS_NAMES", "book,stamp,coin,drumstick,vinyl")
         print(f"Loading class names from env: {class_names_str}")
         self.class_names = class_names_str.split(",")
         print(f"Initialized class names: {self.class_names}")
