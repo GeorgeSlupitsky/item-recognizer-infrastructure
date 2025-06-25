@@ -68,3 +68,36 @@ python submit_ray_job.py
 # Monitor Ray dashboard (port forwarded by setup script)
 open http://localhost:8265
 ```
+
+### ✅ HW3: Ray Serve Model Deployment
+- Implemented model serving using Ray Serve
+- Deployed CNN model on Kubernetes Ray cluster
+- Key features:
+  - FastAPI endpoint for image predictions
+  - W&B model artifact loading
+  - Kubernetes ConfigMap for environment configuration
+  - Automatic model reloading
+  - Detailed logging and error handling
+
+**Setup Instructions:**
+```bash
+# Start Ray cluster if not running
+chmod +x k8s/setup_cluster.sh
+./k8s/setup_cluster.sh
+
+# Deploy the serve application
+cd model/cnn-cpu/serve
+
+# Update environment variables
+kubectl apply -f env-configmap.yaml
+kubectl apply -f env-secret.yaml
+
+# Deploy the serve app
+kubectl apply -f deploy_cnn_k8s.yaml
+
+# Port-forward Ray Serve endpoint
+kubectl port-forward service/raycluster-kuberay-head-svc 8000:8000
+
+# Test prediction endpoint
+curl -X POST -F "file=@path/to/image.jpg" http://localhost:8000/predict
+```
