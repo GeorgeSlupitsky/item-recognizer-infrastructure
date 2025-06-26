@@ -113,11 +113,6 @@ curl -X POST -F "file=@path/to/image.jpg" http://localhost:8000/predict
 
 **Setup Instructions:**
 ```bash
-# Install Prometheus stack if not installed
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm install prometheus prometheus-community/kube-prometheus-stack -n prometheus-system --create-namespace
-
 # Deploy ServiceMonitor and Grafana dashboard
 kubectl apply -f model/k8s/monitoring/prometheus/ray-servicemonitor.yaml
 kubectl apply -f model/k8s/monitoring/prometheus/requests-dashboard-configmap.yaml
