@@ -8,4 +8,4 @@ data:
   WANDB_MODEL_ARTIFACT: "item-recognizer-model:latest"
   WANDB_MODEL_FILENAME: "best_custom_cnn.keras"
   WANDB_MODE: "online"
-  CLASS_NAMES: "Coin,Spoon,Fork,Knife"
+  CLASS_NAMES: "Book,Stamp,Coin,Drumstick,Vinyl"
