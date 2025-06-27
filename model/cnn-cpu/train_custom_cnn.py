@@ -29,7 +29,7 @@ def load_config(config_path='/data/model/cnn-cpu/config.yaml'):
         config['img_size'] = tuple(config['img_size'])
     defaults = {
         'json_path': 'data/label_studio_export.json',
-        'model_save_path': 'best_custom_cnn.keras',
+        'model_save_path': 'best_custom_cnn',  # Directory for SavedModel format
         'img_size': (224, 224),
         'batch_size': 32,
         'epochs': 20,
@@ -87,15 +87,13 @@ def prepare_data(config):
 def build_cnn(num_classes):
     model = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(*CONFIG['img_size'], 3)),
-        tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
+        tf.keras.layers.Conv2D(16, (3, 3), activation='relu'),  
         tf.keras.layers.MaxPooling2D(),
-        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-        tf.keras.layers.MaxPooling2D(),
-        tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+        tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),  
         tf.keras.layers.MaxPooling2D(),
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(256, activation='relu'),
-        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(64, activation='relu'),  
+        tf.keras.layers.Dropout(0.3),  
         tf.keras.layers.Dense(num_classes, activation='softmax')
     ])
     return model
@@ -186,8 +184,8 @@ def main():
         final_model.set_weights(trained_weights)
 
         model_path = os.path.join('/data/model/cnn-cpu', config['model_save_path'])
-        final_model.save(model_path)
-        print(f"✅ Model saved locally at {model_path}")
+        final_model.save(model_path, save_format='tf')
+        print(f"✅ Model saved locally at {model_path} in SavedModel format")
 
         if use_wandb:
             try:
@@ -197,7 +195,7 @@ def main():
                     description="Custom CNN model for item classification",
                     metadata={"img_size": config["img_size"], "epochs": config["epochs"], "run_name": config["run_name"]}
                 )
-                artifact.add_file(model_path)
+                artifact.add_dir(model_path)
                 wandb.log_artifact(artifact, aliases=["latest", "v1"])
                 artifact.wait()
                 print("✅ Model artifact logged to W&B")

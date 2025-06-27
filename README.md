@@ -127,3 +127,39 @@ python model/cnn-cpu/serve/test_load.py
 # View metrics in Grafana dashboard (default credentials: admin/prom-operator)
 open http://localhost:3000
 ```
+
+### ✅ HW5: CI/CD Pipeline Implementation
+- Implemented GitHub Actions workflow for automated training and deployment
+- Key features:
+  - Automated model training on Ray cluster
+  - W&B experiment tracking and artifact management
+  - Automated Ray Serve deployment
+  - Kubernetes manifest management
+  - Environment configuration via ConfigMaps
+  - Proper job completion handling
+
+**Setup Instructions:**
+```bash
+# Create secrets file for local testing
+cat > .secrets << EOL
+WANDB_API_KEY=your_api_key
+EOL
+
+# Install act for local GitHub Actions testing
+brew install act
+
+# Run training stage locally
+act -W .github/workflows/ci-cd.yaml -j train -s WANDB_API_KEY="$(cat .secrets | grep WANDB_API_KEY | cut -d= -f2)" -s KUBECONFIG="$(kubectl config view --raw | base64)" --container-architecture linux/amd64 --bind --network host
+
+# Run deployment stage locally
+act -W .github/workflows/ci-cd.yaml -j deploy -s WANDB_API_KEY="$(cat .secrets | grep WANDB_API_KEY | cut -d= -f2)" -s KUBECONFIG="$(kubectl config view --raw | base64)" --container-architecture linux/amd64 --bind --network host
+
+# Monitor Ray dashboard
+open http://localhost:8265
+
+# Test the deployed model
+curl -X POST -F "file=@path/to/image.jpg" http://localhost:8000/predict
+
+# View metrics in Grafana dashboard (default credentials: admin/prom-operator)
+open http://localhost:3000
+```

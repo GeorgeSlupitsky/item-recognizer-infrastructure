@@ -118,7 +118,7 @@ def run_ray_job(file_contents):
 
 def main():
     print("🚀 Submitting Custom CNN Job to Ray")
-    ray_address = "ray://localhost:10001"
+    ray_address = os.getenv("RAY_ADDRESS", "ray://localhost:10001")
 
     if not check_required_files():
         return
