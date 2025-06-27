@@ -1,12 +1,14 @@
 import os
 import tempfile
+import time
 import tensorflow as tf
 import wandb
 from dotenv import load_dotenv
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Response
 from fastapi.responses import JSONResponse
 from ray import serve
 from ray.serve.handle import DeploymentHandle
+from prometheus_client import Counter, Histogram, generate_latest
 
 load_dotenv()
 
@@ -22,10 +24,30 @@ class APIIngress:
         self.handle: DeploymentHandle = model_handle.options(
             use_new_handle_api=True
         )
+        
+        # Prometheus metrics
+        self.PREDICTION_REQUESTS = Counter(
+            'prediction_requests_total',
+            'Total number of prediction requests'
+        )
+        self.PREDICTION_DURATION = Histogram(
+            'prediction_request_duration_seconds',
+            'Time spent processing prediction request',
+            buckets=[0.1, 0.5, 1.0, 2.0, 5.0]
+        )
+        
+        @app.get('/metrics')
+        async def metrics():
+            return Response(
+                content=generate_latest(),
+                media_type='text/plain'
+            )
 
     @app.post("/predict")
     async def predict(self, file: UploadFile = File(...)):
+        start_time = time.time()
         try:
+            self.PREDICTION_REQUESTS.inc()
             print(f"Received prediction request for file {file.filename}")
             image_bytes = await file.read()
             print(f"Read {len(image_bytes)} bytes from file")
@@ -37,6 +59,8 @@ class APIIngress:
             import traceback
             print(traceback.format_exc())
             return JSONResponse(content={"error": str(e)}, status_code=500)
+        finally:
+            self.PREDICTION_DURATION.observe(time.time() - start_time)
 
 @serve.deployment(
     autoscaling_config={"min_replicas": 1, "max_replicas": 2},
