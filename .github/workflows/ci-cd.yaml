@@ -1,0 +1,126 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+  WANDB_PROJECT: item-recognizer
+  WANDB_ENTITY: yehor-slupitskyi-3mcollect
+  WANDB_MODEL_ARTIFACT: artifacts/model/item-recognizer-model:latest
+  WANDB_MODEL_FILENAME: best_custom_cnn.keras
+  CLASS_NAMES: book,stamp,coin,drumstick,vinyl
+
+jobs:
+  train:
+    name: Train Model
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r model/cnn-cpu/requirements.txt
+
+      - name: Install tools
+        run: |
+          # Install kubectl
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          
+          # Install netcat
+          sudo apt-get update && sudo apt-get install -y netcat-openbsd
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Train model in Ray and log to W&B
+        run: |
+          # Start port-forward and save PID
+          kubectl port-forward service/raycluster-kuberay-head-svc 10001:10001 &
+          PORT_FORWARD_PID=$!
+          
+          # Wait for port-forward to be ready
+          for i in $(seq 1 30); do
+            if nc -z localhost 10001; then
+              echo "✅ Port forward is ready"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "❌ Port forward failed to establish"
+              exit 1
+            fi
+            echo "Waiting for port forward... ($i/30)"
+            sleep 1
+          done
+          
+          # Run the training
+          cd model/cnn-cpu
+          RAY_ADDRESS=ray://127.0.0.1:10001 python submit_ray_job.py
+          TRAIN_EXIT=$?
+          
+          # Clean up port-forward
+          kill $PORT_FORWARD_PID || true
+          wait $PORT_FORWARD_PID 2>/dev/null || true
+          
+          # Exit with training status
+          exit $TRAIN_EXIT
+
+  deploy:
+    name: Deploy Model to Ray Serve
+    needs: train
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r model/cnn-cpu/serve/requirements.txt
+
+      - name: Install tools
+        run: |
+          # Install kubectl
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          
+          # Install netcat
+          sudo apt-get update && sudo apt-get install -y netcat-openbsd
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Apply Kubernetes manifests for Ray Serve
+        run: |
+          cd model/cnn-cpu/serve
+          kubectl apply -f code-configmap.yaml
+          kubectl apply -f env-configmap.yaml
+          kubectl apply -f env-secret.yaml
+          kubectl apply -f deploy_cnn_k8s.yaml
+          
+          # Wait for deployment to be ready
+          kubectl wait --for=condition=available deployment/cnn-serve-deployment --timeout=300s
