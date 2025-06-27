@@ -11,7 +11,7 @@ env:
   WANDB_PROJECT: item-recognizer
   WANDB_ENTITY: yehor-slupitskyi-3mcollect
   WANDB_MODEL_ARTIFACT: artifacts/model/item-recognizer-model:latest
-  WANDB_MODEL_FILENAME: best_custom_cnn.keras
+  WANDB_MODEL_FILENAME: best_custom_cnn
   CLASS_NAMES: book,stamp,coin,drumstick,vinyl
 
 jobs:

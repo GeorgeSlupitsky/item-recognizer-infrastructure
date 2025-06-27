@@ -197,7 +197,7 @@ def main():
                     description="Custom CNN model for item classification",
                     metadata={"img_size": config["img_size"], "epochs": config["epochs"], "run_name": config["run_name"]}
                 )
-                artifact.add_file(model_path)
+                artifact.add_dir(model_path)
                 wandb.log_artifact(artifact, aliases=["latest", "v1"])
                 artifact.wait()
                 print("✅ Model artifact logged to W&B")
