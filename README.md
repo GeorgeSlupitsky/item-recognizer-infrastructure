@@ -101,3 +101,29 @@ kubectl port-forward service/raycluster-kuberay-head-svc 8000:8000
 # Test prediction endpoint
 curl -X POST -F "file=@path/to/image.jpg" http://localhost:8000/predict
 ```
+
+### ✅ HW4: Prometheus Metrics Integration
+- Added Prometheus metrics to Ray Serve deployment
+- Configured Grafana dashboards for monitoring
+- Key features:
+  - Request rate tracking
+  - Request duration histogram
+  - Real-time metrics visualization
+  - Automatic metrics scraping via ServiceMonitor
+
+**Setup Instructions:**
+```bash
+# Deploy ServiceMonitor and Grafana dashboard
+kubectl apply -f model/k8s/monitoring/prometheus/ray-servicemonitor.yaml
+kubectl apply -f model/k8s/monitoring/prometheus/requests-dashboard-configmap.yaml
+
+# Port-forward Prometheus and Grafana
+kubectl port-forward -n prometheus-system svc/prometheus-kube-prometheus-prometheus 9090:9090
+kubectl port-forward -n prometheus-system svc/prometheus-grafana 3000:80
+
+# Generate test load (in a separate terminal)
+python model/cnn-cpu/serve/test_load.py
+
+# View metrics in Grafana dashboard (default credentials: admin/prom-operator)
+open http://localhost:3000
+```

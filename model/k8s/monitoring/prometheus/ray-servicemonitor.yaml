@@ -2,15 +2,18 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: ray-head-monitor
-  namespace: default
+  namespace: prometheus-system
   labels:
-    # This label is required for Prometheus to discover this ServiceMonitor
+    app: kube-prometheus-stack-prometheus
     release: prometheus
 spec:
+  namespaceSelector:
+    matchNames:
+      - default
   selector:
     matchLabels:
       ray.io/node-type: head
   endpoints:
-  - port: metrics
+  - port: serve
     interval: 30s
-    path: /metrics 
+    path: /metrics
